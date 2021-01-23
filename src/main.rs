@@ -8,19 +8,6 @@ struct Todo {
     done: bool,
 }
 
-#[get("/{id}/{name}/index.html")]
-async fn index(web::Path((id, name)): web::Path<(u32, String)>) -> impl Responder {
-    format!("Hello {}! id:{}", name, id)
-}
-
-#[actix_web::main]
-async fn main() -> std::io::Result<()> {
-    HttpServer::new(|| App::new().service(index))
-        .bind("127.0.0.1:8080")?
-        .run()
-        .await
-}
-
 #[get("/todos/{id}")]
 async fn get_todo(web::Path(id): web::Path<u32>) -> impl Responder {
     println!("get_todo");
@@ -37,4 +24,12 @@ async fn post_todo(todo: web::Json<Todo>) -> impl Responder {
     println!("post_todo");
     println!("{:?}", todo);
     HttpResponse::Ok().body("ok")
+}
+
+#[actix_web::main]
+async fn main() -> std::io::Result<()> {
+    HttpServer::new(|| App::new().service(get_todo).service(post_todo))
+        .bind("127.0.0.1:8080")?
+        .run()
+        .await
 }
